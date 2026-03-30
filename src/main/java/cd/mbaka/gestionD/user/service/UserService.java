@@ -12,7 +12,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public UserModel register(UserModel user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
