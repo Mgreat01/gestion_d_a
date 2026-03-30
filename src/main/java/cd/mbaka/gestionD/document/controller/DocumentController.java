@@ -2,8 +2,8 @@ package cd.mbaka.gestionD.document.controller;
 
 import cd.mbaka.gestionD.document.model.DocumentModel;
 import cd.mbaka.gestionD.document.service.DocumentService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,9 +32,12 @@ public class DocumentController {
             @RequestParam("document") String documentJson,
             @RequestParam("file") MultipartFile file) {
         try {
-            // Conversion manuelle pour éviter les erreurs de désérialisation
+            objectMapper.registerModule(new JavaTimeModule());
+
             DocumentModel document = objectMapper.readValue(documentJson, DocumentModel.class);
-            return ResponseEntity.status(HttpStatus.CREATED).body(service.save(document, file));
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(service.save(document, file));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

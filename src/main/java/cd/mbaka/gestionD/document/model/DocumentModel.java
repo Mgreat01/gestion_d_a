@@ -1,10 +1,13 @@
 package cd.mbaka.gestionD.document.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "documents")
@@ -27,9 +30,11 @@ public class DocumentModel {
 
     @Enumerated(EnumType.STRING)
     private DocumentPriority priority;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate date;
 
-    private LocalDateTime date;
-    private LocalDateTime expirationDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate expirationDate;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -43,20 +48,14 @@ public class DocumentModel {
     private List<String> tags = new ArrayList<>();
 
     private String category;
+    @JsonProperty("isFavorite")
     private boolean isFavorite = false;
+
+    @JsonProperty("isShared")
     private boolean isShared = false;
 
     @ElementCollection
     private List<String> sharedWith = new ArrayList<>();
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "document_id")
-    private List<CommentModel> comments = new ArrayList<>();
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "document_id")
-    private List<DocumentVersionModel> versions = new ArrayList<>();
-
     private String createdBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -65,7 +64,7 @@ public class DocumentModel {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        if (this.date == null) this.date = LocalDateTime.now();
+        if (this.date == null) this.date = LocalDate.now();
     }
 
     @PreUpdate
