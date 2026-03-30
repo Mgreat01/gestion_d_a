@@ -5,11 +5,17 @@ import cd.mbaka.gestionD.document.service.DocumentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import org.springframework.core.io.Resource;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.util.List;
 
@@ -48,5 +54,24 @@ public class DocumentController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/view/{fileName:.+}")
+    public ResponseEntity<Resource> getFile(@PathVariable String fileName) {
+        try {
+            Path file = Paths.get("uploads").resolve(fileName);
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                        .contentType(MediaType.APPLICATION_PDF) // Ou détecter selon l'extension
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

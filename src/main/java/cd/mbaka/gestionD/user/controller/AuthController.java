@@ -23,15 +23,19 @@ public class AuthController {
     }
 
 
+    // AuthController.java
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> credentials) {
         String email = credentials.get("email");
         String password = credentials.get("password");
 
         String token = userService.login(email, password);
+        UserModel user = userService.findByEmail(email);
 
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
+        response.put("username", user.getFullName());
 
         return ResponseEntity.ok(response);
     }
