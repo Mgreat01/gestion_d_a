@@ -55,4 +55,9 @@ public class DocumentService {
             repository.deleteById(id);
         });
     }
+
+    public List<DocumentModel> findMyDocuments() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return repository.findByUserEmail(email);
+    }
 }

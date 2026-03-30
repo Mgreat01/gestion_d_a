@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public UserModel register(UserModel user) {
@@ -27,5 +28,16 @@ public class UserService {
     public UserModel findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+    }
+
+    public String login(String email, String password) {
+        UserModel user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Identifiants incorrects"));
+
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            return jwtService.generateToken(user.getEmail());
+        } else {
+            throw new RuntimeException("Identifiants incorrects");
+        }
     }
 }
