@@ -38,4 +38,16 @@ public class DocumentService {
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         return documentRepository.findByUserEmail(currentUserEmail);
     }
+
+    public void delete(Long id) {
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        DocumentModel doc = documentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Document non trouvé"));
+
+        if (!doc.getUser().getEmail().equals(currentUserEmail)) {
+            throw new RuntimeException("Vous n'avez pas le droit de supprimer ce document");
+        }
+
+        documentRepository.deleteById(id);
+    }
 }
