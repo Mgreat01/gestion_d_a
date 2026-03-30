@@ -1,5 +1,6 @@
 package cd.mbaka.gestionD.document.model;
 
+import cd.mbaka.gestionD.user.model.UserModel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
@@ -53,6 +54,10 @@ public class DocumentModel {
 
     @JsonProperty("isShared")
     private boolean isShared = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserModel user;
 
     @ElementCollection
     private List<String> sharedWith = new ArrayList<>();
